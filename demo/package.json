@@ -1,0 +1,17 @@
+{
+  "name": "@digiconvent/qap-demo",
+  "private": true,
+  "type": "module",
+  "description": "Middle-earth stories played against the QAP middleware, one lane per person",
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "start": "npm run build && cd server && go run .",
+    "verify": "node verify/dist/verify.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsup": "^8.5.1",
+    "typescript": "~5.6"
+  }
+}

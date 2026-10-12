@@ -1,0 +1,61 @@
+name: release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag of the release to fill in, such as v1.0.0'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      RELEASED: ${{ github.event.release.tag_name || inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ github.event.release.tag_name || inputs.version }}
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Read the version from the release
+        run: |
+          echo "$RELEASED" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$' || { echo "the release must be named like v1.0.0, so Go can find it, not $RELEASED"; exit 1; }
+          VERSION="${RELEASED#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Set the version of the middleware and the client
+        run: |
+          printf 'package layer4\n\nvar Version = "%s"\n' "$VERSION" > middleware/internal/layer4/version.go
+          printf "export const version = '%s'\n" "$VERSION" > client/src/version.ts
+          (cd client && npm version "$VERSION" --no-git-tag-version --allow-same-version)
+
+      - name: Test the middleware
+        run: go vet ./... && go test -race ./...
+
+      - name: Test the client
+        working-directory: client
+        run: npm ci && npm test && npm run typecheck && npm run build
+
+      - name: Put the versions into the release
+        run: |
+          git config user.name DigiConvent
+          git config user.email digiconvent@proton.me
+          git add middleware/internal/layer4/version.go client/src/version.ts client/package.json client/package-lock.json
+          git diff --cached --quiet || git commit -m "Release $VERSION"
+          git tag -f "$RELEASED"
+          git push -f origin "refs/tags/$RELEASED"

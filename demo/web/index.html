@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QAP lanes</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --ink: #1d1d1b; --muted: #6d6a63; --line: #dedbd2; --soft: #efede7;
+  --accent: #2f5d8a; --now: #e8f0f8; --pass: #2e7d4f; --fail: #b3261e; --warn: #9a6b00;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #161615; --panel: #201f1d; --ink: #ecebe6; --muted: #9b978d; --line: #36342f; --soft: #2a2926; --accent: #7fb0e0; --now: #1d2a37; --pass: #6fcf97; --fail: #ff8a80; --warn: #e6b450; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
+main { max-width: 1280px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 16px; margin: 0; text-transform: capitalize; }
+h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 4px; }
+p { margin: 4px 0; }
+code { font: 12px ui-monospace, monospace; background: var(--soft); padding: 1px 4px; border-radius: 4px; overflow-wrap: anywhere; }
+.muted { color: var(--muted); }
+.intro { color: var(--muted); max-width: 70ch; margin: 4px 0 14px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+select, button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+#next, .run { background: var(--accent); border-color: var(--accent); color: var(--panel); font-weight: 600; }
+#verdict { margin-left: auto; font-weight: 600; }
+.pass { color: var(--pass); } .fail { color: var(--fail); }
+#summary { font-size: 15px; margin: 0 0 12px; }
+#proposal { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 16px; }
+.proposal-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.what { font-size: 15px; }
+.rule { border-left: 3px solid var(--accent); padding-left: 8px; margin-top: 8px; }
+.tally { display: flex; gap: 18px; margin-top: 8px; font-size: 15px; }
+.ran { color: var(--pass); font-weight: 600; margin-top: 8px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; padding: 2px 7px; border-radius: 4px; background: var(--soft); color: var(--muted); white-space: nowrap; }
+.badge-pending { background: var(--warn); color: var(--panel); }
+.badge-executed { background: var(--pass); color: var(--panel); }
+.badge-rejected, .badge-refused { background: var(--fail); color: var(--panel); }
+.badge-discovered, .badge-listed, .badge-withdrawn { background: var(--accent); color: var(--panel); }
+#lanes { overflow-x: auto; }
+.grid { display: grid; gap: 0 12px; min-width: min-content; }
+.cell { padding: 6px 0; }
+.head { position: sticky; top: 0; background: var(--bg); padding-bottom: 10px; border-bottom: 2px solid var(--line); z-index: 1; }
+.explain { font-size: 13px; }
+.can { font-size: 12px; color: var(--muted); }
+.chip { display: inline-block; border: 1px solid var(--line); border-radius: 10px; padding: 0 7px; margin: 2px 3px 0 0; color: var(--ink); }
+.number { color: var(--muted); text-align: right; font-weight: 600; padding-top: 16px; }
+.number.now { color: var(--accent); }
+.cell.now:not(.number) { background: linear-gradient(var(--now), var(--now)) center / 100% calc(100% - 4px) no-repeat; border-radius: 6px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.card.future { opacity: .5; border-style: dashed; }
+.card.current { border: 2px solid var(--accent); }
+.card.bad { border-left: 4px solid var(--fail); }
+.says { font-weight: 600; }
+.answer { margin-top: 6px; }
+.why { color: var(--muted); font-size: 13px; }
+.run { margin-top: 6px; }
+.payload { margin-top: 8px; }
+.payload summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--accent); }
+.wire h4 { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 8px 0 2px; }
+.wire pre { margin: 0; padding: 8px; background: var(--soft); border-radius: 6px; font: 11.5px/1.4 ui-monospace, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.clock { color: var(--warn); font-weight: 600; margin-top: 8px; }
+.decision { border-top: 1px solid var(--line); padding: 6px 0; }
+.decision ul { margin: 4px 0; padding-left: 18px; color: var(--muted); }
+.who { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; }
+.card.time { text-align: center; border-style: dashed; }
+.card.time.done { opacity: .85; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--muted); margin-top: 18px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>QAP lanes</h1>
+  <p class="intro">Each column is one person. Each row is one step of the story. Run the highlighted step: the person's client sends the request, and their column shows what the server answered and what they can do next. Open "payload" on a step to see the exact HTTP request and response.</p>
+  <div class="controls">
+    <select id="scenario" aria-label="story"></select>
+    <button id="next">run next step</button>
+    <button id="play">play all</button>
+    <button id="restart">restart</button>
+    <span id="verdict"></span>
+  </div>
+  <p id="summary"></p>
+  <section id="proposal"></section>
+  <div id="lanes"></div>
+  <div class="legend">
+    <span><span class="badge badge-pending">pending</span> waiting for votes</span>
+    <span><span class="badge badge-executed">executed</span> the server carried it out</span>
+    <span><span class="badge badge-rejected">rejected</span> voted down</span>
+    <span><span class="badge badge-refused">refused</span> the server said no to this request</span>
+    <span><span class="badge badge-listed">listed</span> <span class="badge badge-discovered">discovered</span> just looking</span>
+  </div>
+</main>
+<script type="module" src="dist/app.js"></script>
+</body>
+</html>

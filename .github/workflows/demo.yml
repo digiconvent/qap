@@ -1,0 +1,36 @@
+name: demo
+
+on:
+  push:
+    branches: [main]
+    paths: ['demo/**', 'client/**', 'middleware/**', '.github/workflows/demo.yml']
+  pull_request:
+    paths: ['demo/**', 'client/**', 'middleware/**', '.github/workflows/demo.yml']
+
+jobs:
+  stories:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: demo/server/go.mod
+          cache-dependency-path: demo/server/go.sum
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: demo/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: go build -o demo-server .
+        working-directory: demo/server
+      - run: ./demo-server &
+        working-directory: demo/server
+      - run: until curl -sf -o /dev/null http://localhost:4280/; do sleep 1; done
+        timeout-minutes: 1
+      - run: npm run verify
