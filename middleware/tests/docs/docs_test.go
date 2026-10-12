@@ -286,7 +286,7 @@ func withLinkTexts(text string, textFor func(target string) (string, bool), from
 
 var linkTextPattern = regexp.MustCompile(`\[([^\]]*)\]\(([^)\s]+)\)`)
 
-// every page carries its code in its title, and indexes and summaries name pages by their full title, the flow by their code; run with -update to rewrite them
+// every page carries its code in its title, and indexes, summaries and the flow name pages by their full title; run with -update to rewrite them
 func TestDocs_Codes(t *testing.T) {
 	pages := loadPages(t)
 	codes := codesOf(t, pages)
@@ -308,11 +308,8 @@ func TestDocs_Codes(t *testing.T) {
 			t.Errorf("%s is not listed in the summary of its folder, so it has no code", p)
 			continue
 		}
-		switch path.Base(p) {
-		case "index.md", "summary.md":
+		if isListing(pages[p]) {
 			want = withLinkTexts(want, func(target string) (string, bool) { title, ok := titles[target]; return title, ok }, p)
-		case "flow.md":
-			want = withLinkTexts(want, func(target string) (string, bool) { code, ok := codes[target]; return code, ok }, p)
 		}
 		if want == string(raw) {
 			continue

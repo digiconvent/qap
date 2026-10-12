@@ -15,13 +15,13 @@ guard := qap.New().
 	RecordAuditTo(auditTrail).
 	AsMiddleware()
 
-app.Delete("/api/library/book/:id/delete", guard.RequiresPermission("library.book.{id}.delete").Run(qap.Handle(deleteBook{library})))
-app.Post("/api/iam/user/:id/set-password", guard.AuthenticatedOrRequiresPermission("iam.user.set-password", "iam.user.{id}.set-password").Run(qap.Handle(setPassword{users})))
-app.Get("/api/forum/latest-news", guard.AllowAuthenticatedOrRequiresPermission().Run(qap.Handle(latestNews{forum})))
-app.Get("/api/calendar/public-events", guard.AllowAnonymous().Run(qap.Handle(publicEvents{calendar})))
+app.Delete("/api/library/book/:id/delete", guard.RequiresPermission("library.book.{id}.delete").Run(deleteBook(library)))
+app.Post("/api/iam/user/:id/set-password", guard.AuthenticatedOrRequiresPermission("iam.user.set-password", "iam.user.{id}.set-password").Run(setPassword(users)))
+app.Get("/api/forum/latest-news", guard.AllowAuthenticatedOrRequiresPermission().Run(latestNews(forum)))
+app.Get("/api/calendar/public-events", guard.AllowAnonymous().Run(publicEvents(calendar)))
 ```
 
-Every step is required, in this order: each step only offers the next one, so a missing step does not compile. Every argument is a named function or value of the host, never an inline function. Every route ends in `Run` with its [Endpoint](endpoint.md), wrapped by `qap.Handle`, so the host writes no Fiber handlers of its own for guarded routes. A route parameter that names an entity is always called `id`, and always holds a UUID.
+Every step is required, in this order: each step only offers the next one, so a missing step does not compile. Every argument is a named function or value of the host, never an inline function. Every route ends in `Run` with its [Endpoint](endpoint.md), a `qap.Handler`, so the host writes no Fiber handlers of its own for guarded routes. A route parameter that names an entity is always called `id`, and always holds a UUID.
 
 ### The arguments
 

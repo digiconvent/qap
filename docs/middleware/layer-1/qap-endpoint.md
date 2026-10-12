@@ -8,16 +8,16 @@ Protects one route of the host application and runs its [Endpoint](../host/endpo
 
 | Protection | Go | Without an intent | With an intent |
 |---|---|---|---|
-| anonymous | `guard.AllowAnonymous().Run(qap.Handle(endpoint))` | Runs the endpoint | Runs the endpoint; the intent is ignored |
-| authenticated | `guard.AllowAuthenticatedOrRequiresPermission().Run(qap.Handle(endpoint))` | Runs the endpoint when logged in, otherwise [Unauthorized (401)](../concepts/errors.md#unauthorized-401) | Same as without |
-| authenticated or requires permission | `guard.AuthenticatedOrRequiresPermission(permissions...).Run(qap.Handle(endpoint))` | Runs the endpoint when logged in, otherwise [Unauthorized (401)](../concepts/errors.md#unauthorized-401) | Handled by QAP, as below |
-| requires permission | `guard.RequiresPermission(permissions...).Run(qap.Handle(endpoint))` | [Missing intent (406)](../concepts/errors.md#missing-intent-406) | Handled by QAP, as below |
+| anonymous | `guard.AllowAnonymous().Run(endpoint)` | Runs the endpoint | Runs the endpoint; the intent is ignored |
+| authenticated | `guard.AllowAuthenticatedOrRequiresPermission().Run(endpoint)` | Runs the endpoint when logged in, otherwise [Unauthorized (401)](../concepts/errors.md#unauthorized-401) | Same as without |
+| authenticated or requires permission | `guard.AuthenticatedOrRequiresPermission(permissions...).Run(endpoint)` | Runs the endpoint when logged in, otherwise [Unauthorized (401)](../concepts/errors.md#unauthorized-401) | Handled by QAP, as below |
+| requires permission | `guard.RequiresPermission(permissions...).Run(endpoint)` | [Missing intent (406)](../concepts/errors.md#missing-intent-406) | Handled by QAP, as below |
 
 The two protections that take permissions need at least one. Without, they panic when the route is set up, not on its first request.
 
 Before anything else, a route parameter `id` must pass [Is UUID](../layer-4/is-uuid.md), whatever the protection; otherwise [Invalid id (400)](../concepts/errors.md#invalid-id-400).
 
-**Runs the endpoint:** the incoming [Request](../concepts/request.md), with the current user, is copied; its body goes through [Decode payload](../layer-4/decode-payload.md) to Check. [Problems](../layer-4/problems.md) found: [Cannot be carried out (422)](../concepts/errors.md#cannot-be-carried-out-422). Otherwise Execute runs, and [Write result](../layer-4/write-result.md) turns its result into the answer.
+**Runs the endpoint:** the incoming [Request](../concepts/request.md), with the current user, is copied; its body goes to Check, when the endpoint has one. [Problems](../layer-4/problems.md) found: [Cannot be carried out (422)](../concepts/errors.md#cannot-be-carried-out-422). Otherwise Execute runs, and [Write result](../layer-4/write-result.md) turns its result into the answer.
 
 **Handled by QAP:**
 

@@ -84,3 +84,16 @@ func TestCarryOut_CheckFails(t *testing.T) {
 		t.Fatalf("got %+v, executed %d", result, len(l.executed))
 	}
 }
+
+// a handler without a check is executed as it is
+func TestCarryOut_WithoutCheck(t *testing.T) {
+	l := newLibrary()
+	l.refuses = true
+	handler := l.handler(false)
+	handler.Check = nil
+	result, _ := layer3.CarryOut(concepts.Submission{Params: map[string]string{"id": "7"}, Handler: handler})
+
+	if result.Status != 204 || len(l.executed) != 1 {
+		t.Fatalf("got %+v, executed %d", result, len(l.executed))
+	}
+}

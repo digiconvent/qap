@@ -78,7 +78,7 @@ Body shape: `{"error": "<message>", "hint": "<how to fix it>"}`. `hint` is optio
 
 ### Cannot be carried out (422)
 
-`{"error": "the request cannot be carried out", "problems": {"<field>": ["<message>"]}}`. The body did not pass [Decode payload](../layer-4/decode-payload.md), or the Check of the [Endpoint](../host/endpoint.md) found [Problems](../layer-4/problems.md), with a plain request or a [Submit](../layer-2/submit.md). After approval, [Carry out](../layer-3/carry-out.md) stores the same body as the result instead.
+`{"error": "the request cannot be carried out", "problems": {"<field>": ["<message>"]}}`. The Check of the [Endpoint](../host/endpoint.md) found [Problems](../layer-4/problems.md), with a plain request or a [Submit](../layer-2/submit.md). After approval, [Carry out](../layer-3/carry-out.md) stores the same body as the result instead.
 
 ---
 
@@ -90,8 +90,7 @@ Body shape: `{"error": "<message>", "hint": "<how to fix it>"}`. `hint` is optio
 - [A7 Problems](../layer-4/problems.md)
 - [A15 Vote value](../layer-4/vote-value.md)
 - [A16 Withhold rule](../layer-4/withhold-rule.md)
-- [A19 Decode payload](../layer-4/decode-payload.md)
-- [A20 Is UUID](../layer-4/is-uuid.md)
+- [A19 Is UUID](../layer-4/is-uuid.md)
 - [B1 Carry out](../layer-3/carry-out.md)
 - [B2 Cleanup](../layer-3/cleanup.md)
 - [B4 Eligibility](../layer-3/eligibility.md)

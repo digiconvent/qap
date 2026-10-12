@@ -22,5 +22,4 @@ Layer 4 holds the atomic parts: small pieces of logic that take plain values and
 - [A16 Withhold rule](withhold-rule.md)
 - [A17 Write result](write-result.md)
 - [A18 Changes](changes.md)
-- [A19 Decode payload](decode-payload.md)
-- [A20 Is UUID](is-uuid.md)
+- [A19 Is UUID](is-uuid.md)

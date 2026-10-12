@@ -27,19 +27,6 @@ type title struct {
 	Title string `json:"title"`
 }
 
-// a json body decodes into the payload, an empty body is the empty payload, and anything else is a problem of the body
-func TestDecodePayload(t *testing.T) {
-	if payload, problems := layer4.DecodePayload[title](`{"title":"The Red Book"}`); problems != nil || payload.Title != "The Red Book" {
-		t.Fatalf("got %+v %v", payload, problems)
-	}
-	if payload, problems := layer4.DecodePayload[title]("  "); problems != nil || payload.Title != "" {
-		t.Fatalf("empty: got %+v %v", payload, problems)
-	}
-	if _, problems := layer4.DecodePayload[title](`{"title":7}`); problems["body"] == nil {
-		t.Fatalf("wrong type: got %v", problems)
-	}
-}
-
 // the changes list every field that differs before and after, also fields that appear or disappear
 func TestChanges(t *testing.T) {
 	before := map[string]any{"title": "There and Back Again", "author": "Bilbo", "pages": 300}

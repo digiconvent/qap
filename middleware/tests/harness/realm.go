@@ -19,7 +19,7 @@ type Realm struct {
 	memberships map[string][]string
 	policies    map[string][]qap.Policy
 	people      map[string]map[string]any
-	executed    []qap.Request[Payload]
+	executed    []Execution
 	audited     []qap.AuditSummary
 	refusing    bool
 }
@@ -116,7 +116,7 @@ func (r *Realm) SetPolicies(permission string, policies ...qap.Policy) {
 	r.policies[permission] = policies
 }
 
-func (r *Realm) Executed() []qap.Request[Payload] {
+func (r *Realm) Executed() []Execution {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	return slices.Clone(r.executed)

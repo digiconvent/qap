@@ -7,8 +7,10 @@ import (
 
 func CarryOut(s concepts.Submission) (concepts.Result, map[string]concepts.Change) {
 	request := s.Request()
-	if problems := layer4.Problems(s.Handler.Check(request.Body)); problems != nil {
-		return concepts.Result{Status: 422, Headers: map[string]string{}, Body: concepts.CannotBeCarriedOut(problems).Body}, nil
+	if s.Handler.Check != nil {
+		if problems := layer4.Problems(s.Handler.Check(request.Body)); problems != nil {
+			return concepts.Result{Status: 422, Headers: map[string]string{}, Body: concepts.CannotBeCarriedOut(problems).Body}, nil
+		}
 	}
 	id := request.Params["id"]
 	if s.Handler.Read == nil || id == "" {

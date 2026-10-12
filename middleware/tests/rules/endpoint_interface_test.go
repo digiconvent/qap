@@ -14,15 +14,7 @@ func TestEndpointInterface_IdMustBeUuid(t *testing.T) {
 	Expect(t, refused.Status == 400 && refused.Message() == "the id must be a UUID", "got %d %s", refused.Status, refused.Raw)
 }
 
-// a body that is not the json payload of the endpoint is refused before the check
-func TestEndpointInterface_PayloadMustDecode(t *testing.T) {
-	realm := New(t)
-	refused := realm.As("frodo").Proposes(CreateUser, PeerReview, `{"email":`)
-	problems, _ := refused.Body["problems"].(map[string]any)
-	Expect(t, refused.Status == 422 && problems["body"] != nil, "got %d %s", refused.Status, refused.Raw)
-}
-
-// the endpoint executes the decoded payload with the submission as context, the author as user and the route parameters
+// the endpoint executes the stored body with the submission as context, the author as user and the route parameters
 func TestEndpointInterface_ExecuteReceivesTheSubmission(t *testing.T) {
 	realm := New(t)
 	proposed := realm.As("frodo").Proposes(UpdateFrodo, PeerReview, `{"name":"Mr. Underhill"}`)

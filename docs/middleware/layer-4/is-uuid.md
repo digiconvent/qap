@@ -1,4 +1,4 @@
-# A20 Is UUID
+# A19 Is UUID
 
 Ids are always UUIDs. Every route parameter called `id` must be one, on every request to the route, whatever the protection and the intent; anything else is refused before QAP does anything else.
 

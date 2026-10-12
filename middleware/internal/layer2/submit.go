@@ -29,8 +29,10 @@ func (i Intents) Submit(ctx fiber.Ctx, call Call) error {
 
 	request := i.dependencies.CopyRequest(ctx)
 	request.User = call.User
-	if problems := i.dependencies.Problems(call.Endpoint.Check(request.Body)); problems != nil {
-		return concepts.CannotBeCarriedOut(problems).Send(ctx)
+	if call.Endpoint.Check != nil {
+		if problems := i.dependencies.Problems(call.Endpoint.Check(request.Body)); problems != nil {
+			return concepts.CannotBeCarriedOut(problems).Send(ctx)
+		}
 	}
 	now := i.dependencies.Now().Unix()
 	s := concepts.Submission{

@@ -28,19 +28,9 @@ type stubAuditTrail struct{}
 
 func (stubAuditTrail) Record(summary qap.AuditSummary) {}
 
-type book struct {
-	Title string `json:"title"`
-}
-
-type stubEndpoint struct{}
-
-func (stubEndpoint) Check(payload book) map[string][]error {
-	return nil
-}
-
-func (stubEndpoint) Execute(request qap.Request[book]) qap.Result {
+var stubEndpoint = qap.Handler{Execute: func(request qap.Request) qap.Result {
 	return qap.Result{Status: 204}
-}
+}}
 
 func configuredGuard() qap.Guard {
 	return qap.New().
@@ -85,10 +75,10 @@ func TestSetup_GuardOffersFourProtections(t *testing.T) {
 	guard := configuredGuard()
 
 	protections := map[string]fiber.Handler{
-		"anonymous":                            guard.AllowAnonymous().Run(qap.Handle(stubEndpoint{})),
-		"authenticated":                        guard.AllowAuthenticatedOrRequiresPermission().Run(qap.Handle(stubEndpoint{})),
-		"authenticated or requires permission": guard.AuthenticatedOrRequiresPermission("iam.user.set-password").Run(qap.Handle(stubEndpoint{})),
-		"requires permission":                  guard.RequiresPermission("library.book.{id}.delete").Run(qap.Handle(stubEndpoint{})),
+		"anonymous":                            guard.AllowAnonymous().Run(stubEndpoint),
+		"authenticated":                        guard.AllowAuthenticatedOrRequiresPermission().Run(stubEndpoint),
+		"authenticated or requires permission": guard.AuthenticatedOrRequiresPermission("iam.user.set-password").Run(stubEndpoint),
+		"requires permission":                  guard.RequiresPermission("library.book.{id}.delete").Run(stubEndpoint),
 	}
 
 	for name, handler := range protections {
