@@ -30,7 +30,7 @@ func (i Intents) Submit(ctx fiber.Ctx, call Call) error {
 	request := i.dependencies.CopyRequest(ctx)
 	request.User = call.User
 	if call.Endpoint.Check != nil {
-		if problems := i.dependencies.Problems(call.Endpoint.Check(request.Body)); problems != nil {
+		if problems := i.dependencies.Problems(call.Endpoint.Check(request)); problems != nil {
 			return concepts.CannotBeCarriedOut(problems).Send(ctx)
 		}
 	}

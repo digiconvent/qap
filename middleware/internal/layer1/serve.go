@@ -19,7 +19,7 @@ func (g *guard) serve(ctx fiber.Ctx, endpoint concepts.Handler) error {
 	request := layer4.CopyRequest(ctx)
 	request.User = strings.Clone(g.dependencies.CurrentUser(ctx))
 	if endpoint.Check != nil {
-		if problems := layer4.Problems(endpoint.Check(request.Body)); problems != nil {
+		if problems := layer4.Problems(endpoint.Check(request)); problems != nil {
 			return concepts.CannotBeCarriedOut(problems).Send(ctx)
 		}
 	}

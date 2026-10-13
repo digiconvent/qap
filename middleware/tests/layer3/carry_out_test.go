@@ -16,7 +16,7 @@ type library struct {
 
 func (l *library) handler(reads bool) concepts.Handler {
 	handler := concepts.Handler{
-		Check: func(body string) map[string][]error {
+		Check: func(request concepts.Request) map[string][]error {
 			if l.refuses {
 				return map[string][]error{"body": {errors.New("no longer valid")}}
 			}

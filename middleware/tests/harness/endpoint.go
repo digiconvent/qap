@@ -34,7 +34,7 @@ func (e readingEndpoint) handler() qap.Handler {
 	return qap.Handler{Execute: e.Execute, Check: e.Check, Read: e.Read}
 }
 
-func (e endpoint) Check(body string) map[string][]error {
+func (e endpoint) Check(request qap.Request) map[string][]error {
 	e.realm.mutex.Lock()
 	defer e.realm.mutex.Unlock()
 	if e.realm.refusing {

@@ -45,7 +45,7 @@ func newGuard() layer1.Guard {
 
 func passing(refuses bool) concepts.Handler {
 	return concepts.Handler{
-		Check: func(body string) map[string][]error {
+		Check: func(request concepts.Request) map[string][]error {
 			if refuses {
 				return map[string][]error{"body": {errors.New("refused")}}
 			}

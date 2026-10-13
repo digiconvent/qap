@@ -151,7 +151,7 @@ type stubEndpoint struct {
 
 func (e stubEndpoint) handler() concepts.Handler {
 	return concepts.Handler{
-		Check:   func(body string) map[string][]error { return e.problems },
+		Check:   func(request concepts.Request) map[string][]error { return e.problems },
 		Execute: func(request concepts.Request) concepts.Result { return concepts.Result{Status: 204} },
 	}
 }
